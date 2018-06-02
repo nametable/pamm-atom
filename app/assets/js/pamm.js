@@ -41,7 +41,6 @@ var PAMM_OPTIONS_FILENAME = "pamm.json";
 var PA_VERSION_URL = "https://uberent.com/launcher/clientversion?titleid=4";
 var MOD_GENERIC_ICON_URL = "assets/img/generic.png";
 
-var communityModsHTML = '<div style="color: #0d0;margin: 10px 5px; font-size: 1.2em">Please uninstall all file system mods and use Community Mods in PA to reinstall your mods.<div>';
         
 var strPAMMversion = params.info.version;
 
@@ -335,7 +334,6 @@ function jsGenerateModEntryHTML(objMod, boolIsInstalled) {
     /* enable/disable radio button */
     if(modInstalled) {
         
-        if (!pamm.isCommunityMods()) {
             /* Enabled Checkbox, Image */
             if (modInstalled.enabled == true) {
                 strHTML_checkbox = "<input type='checkbox' class='mod_entry_enabled' id='mod" + id + "' checked='checked'>";
@@ -344,7 +342,6 @@ function jsGenerateModEntryHTML(objMod, boolIsInstalled) {
                 strHTML_checkbox = "<input type='checkbox' class='mod_entry_enabled' id='mod" + id + "'>";
                 strHTML_checkbox_image = "<div class='mod_entry_enabled_image'><img id='modimg" + id + "' src='assets/img/checkbox_unchecked.png' /></div>";
             }
-        }
     }
     
     /* metrics */
@@ -466,8 +463,7 @@ function jsGenerateOnlineModsListHTML() {
             "<div class='filter_area_message'> " + jsGetLocaleText('One_or_more_filters_are_currently_applied') + " " +
                 "<span class='filter_area_link'>[ <a href='#'>" + jsGetLocaleText('clear') + "</a> ]</span>" +
             "</div>" +
-        "</div>" + ( pamm.isCommunityMods() ? communityModsHTML : '' ) +
-    "");
+        "</div>");
     
     $('#filter_area_available_text_filter').val(filters['available']);
     $('#filter_area_available_text_filter').on("keyup", jsApplyOnlineModFilter);
@@ -523,8 +519,7 @@ function jsGenerateInstalledModsListHTML(context) {
                 "<td class='filter_area_filter_heading'>" + jsGetLocaleText('Category') + ":</td>" +
                 "<td class='filter_area_filter_list filter_area_filter_list_category'>" + strCategoryHTML + "</td>" +
             "</tr>" +
-            "<tr>" + ( !pamm.isCommunityMods() ?
-
+            "<tr>" + 
                 "<td class='filter_area_filter_heading'>" + jsGetLocaleText('Options') + ":</td>" +
                 "<td>" + 
                     "<div class='filter_area_option_img'><img src='assets/img/checkbox_checked.png' /></div>" +
@@ -532,15 +527,14 @@ function jsGenerateInstalledModsListHTML(context) {
                     "<div class='filter_area_option_img'><img src='assets/img/checkbox_unchecked.png' /></div>" +
                     "<div class='filter_area_option_text'>&nbsp;<a href='#' onClick='jsSetAllModStatus(false, \"" + context + "\")'>" + jsGetLocaleText('Disable_All') + "</a></div>" +
                 "</td>" +
-            "</tr>" : '' ) +
+            "</tr>"+
         "</table>" +
         "<div id='filters_on_" + installedcontext + "'>" +
             "<img class='filter_area_img' src='assets/img/filter.png'>" +
             "<div class='filter_area_message'> " + jsGetLocaleText('One_or_more_filters_are_currently_applied') + " " +
                 "<span class='filter_area_link'>[ <a href='#'>" + jsGetLocaleText('clear') + "</a> ]</span>" +
             "</div>" +
-        "</div>" + ( pamm.isCommunityMods() ? communityModsHTML : '' ) +
-    "");
+        "</div>");
     
     $("#filter_area_" + installedcontext + "_text_filter").val(filters[installedcontext]);
     $("#filter_area_" + installedcontext + "_text_filter").on("keyup", function() { jsApplyInstalledModFilter(context) });

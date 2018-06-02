@@ -121,12 +121,6 @@ function createStreamObject(paPath, osxapp) {
         streamLabel = 'Steam ' + ( titans ? 'Titans' : 'Classic' );
     }
 
-    var communityMods = false;
-    
-    if (communityMods) {
-        streamLabel = streamLabel + ' with Community Mods';
-    }
-
     return {
         stream: stream,
         streamLabel: streamLabel,
@@ -140,8 +134,7 @@ function createStreamObject(paPath, osxapp) {
         steam: steam,
         steamId: steamId,
         steamLabel: steamLabel,
-        titans: titans,
-        communityMods: communityMods
+        titans: titans
     }
 }
 

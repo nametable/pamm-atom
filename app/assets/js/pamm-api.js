@@ -8,14 +8,12 @@ var URL_MODLIST = "http://pamm-mereth.rhcloud.com/api/mod";
 var URL_USAGE = "http://pamm-mereth.rhcloud.com/api/usage";
 
 var PAMM_MOD_ID = "PAMM";
-var PAMM_MOD_IDENTIFIER = "com.pa.deathbydenim.dpamm";
+var PAMM_MOD_IDENTIFIER = "com.pa.pamods.dpamm";
 var PAMM_SERVER_MOD_IDENTIFIER = "com.pa.pamm.server";
 if(process.platform === 'win32') {
     PAMM_MOD_ID = "rPAMM";
-    PAMM_MOD_IDENTIFIER = "com.pa.raevn.rpamm";
+    PAMM_MOD_IDENTIFIER = "com.pa.pamods.rpamm";
 }
-
-var communityMods = pa.last && pa.last.communityMods;
 
 var stream = pa.last ? pa.last.stream : 'stable';
 
@@ -41,10 +39,6 @@ exports.setStream = function(newStream) {
 exports.getStream = function() {
     return stream;
 };
-
-exports.isCommunityMods = function() {
-    return !!communityMods;
-}
 
 exports.getAvailableMods = function (force) {
     available = {};
@@ -86,27 +80,7 @@ exports.getAvailableMods = function (force) {
             mods[mod.identifier] = mod;
         }
         available = mods;
-        
-        prmModcount.done(function(data) {
-            var usages;
-            try {
-                usages = JSON.parse(data);
-                usages = _.indexBy(usages, 'identifier');
-            } catch (e) {
-                jsAddLogMessage("Failed to parse usage data: " + e.message, 1);
-                return;
-            }
-            
-            for (var identifier in available) {
-                var mod = available[identifier];
-                var usage = usages[identifier];
-                mod.downloads = usage ? usage.total : 0;
-                mod.popularity = usage ? usage.popularity : 0;
-            }
-        })
-        .always(function() {
-            _finish();
-        });
+        _finish();
     })
     .fail(function(jqXHR, textStatus, errorThrown) {
         if(!errorThrown) {
@@ -629,7 +603,7 @@ var findInstalledMods = function() {
     _loadUserMods('server');
     
     // load stock mods
-    if(!communityMods && pa.streams[stream]) {
+    if(pa.streams[stream]) {
         var _loadStockMods = function(context) {
             var stockmodspath = path.join(pa.streams[stream].stockmods, context);
             if(fs.existsSync(stockmodspath)) {
@@ -717,9 +691,6 @@ var _fixDependencies = function(mods) {
 
 var _updateFiles = function(context) {
 
-    if (communityMods) {
-        return;
-    }
 
     if(!context) {
         _updateFiles('client');
@@ -866,33 +837,12 @@ var _updateFiles = function(context) {
 };
 
 var setup = function(stream) {
-
-    communityMods = stream.communityMods;
-
     var clientPath = pa.modspath['client'];
     var serverPath = pa.modspath['server'];
-    
     var clientModsPath = path.join(clientPath, 'mods.json');
     var serverModsPath = path.join(serverPath, 'mods.json');
-
     var clientModsBackupPath = path.join(clientPath, 'pamm-mods.json');
     var serverModsBackupPath = path.join(serverPath, 'pamm-mods.json');
-
- 
-    if (communityMods) {
-        rmdirRecurseSync(paths.pamm);
-        rmdirRecurseSync(paths.pamm_server);
-        
-        if (fs.existsSync(clientModsPath)) {
-            fs.renameSync(clientModsPath, clientModsBackupPath);
-        }
-
-        if (fs.existsSync(serverModsPath)) {
-            fs.renameSync(serverModsPath, serverModsBackupPath);
-        }
-        return;
-    }
-
     if (!fs.existsSync(clientModsPath) && fs.existsSync(clientModsBackupPath)) {
         fs.renameSync(clientModsBackupPath, clientModsPath);
     }
