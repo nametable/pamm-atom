@@ -121,7 +121,7 @@ function createStreamObject(paPath, osxapp) {
         streamLabel = 'Steam ' + ( titans ? 'Titans' : 'Classic' );
     }
 
-    var communityMods = buildid.substr(0,4) == '2016';
+    var communityMods = false;
     
     if (communityMods) {
         streamLabel = streamLabel + ' with Community Mods';
