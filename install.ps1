@@ -5,7 +5,7 @@ $ErrorActionPreference = "Stop"
     $PammDir = $ENV:LOCALAPPDATA + "\Uber Entertainment\Planetary Annihilation\pamm"
     $ElectronDir = "$PammDir"
     $AppDir = "$PammDir\resources\app"
-    $env:Path = $env:Path + $WorkingDir + ";"
+    $env:Path = $env:Path + ";" + $WorkingDir + ";"
 
     $ReleasesURL = "https://github.com/electron/electron/releases/tag/v2.0.2"
     $RCEditURL = "https://github.com/electron/rcedit/releases/tag/v1.1.0"
