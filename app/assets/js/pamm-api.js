@@ -4,7 +4,7 @@ var _ = require('lodash');
 var pa = require('./pa.js');
 var compat = require('./pamm-compat.js');
 
-var URL_MODLIST = "http://pamm-mereth.rhcloud.com/api/mod";
+var URL_MODLIST = "https://flubbateios.com/pamm/api/mods";
 var URL_USAGE = "http://pamm-mereth.rhcloud.com/api/usage";
 
 var PAMM_MOD_ID = "PAMM";
@@ -43,40 +43,40 @@ exports.getStream = function() {
 exports.getAvailableMods = function (force) {
     available = {};
     var mods = {};
-    
+
     var deferred = $.Deferred();
-    
+
     var _finish = function() {
         deferred.resolve(_.toArray(available));
     };
-    
+
     if(_.size(available) && !force)
         _finish();
-    
+
     var prmModlist = jsDownload(URL_MODLIST);
     var prmModcount = jsDownload(URL_USAGE);
-    
+
     prmModlist.done(function(data) {
         var modlist;
-        
+
         try {
             modlist = JSON.parse(data);
         } catch (e) {
             deferred.reject("Failed to parse modlist data: " + e.message);
             return;
         }
-        
+
         for (var i in modlist) {
             var mod = modlist[i];
-            
+
             if(!mod.id)
                 mod.id = mod.identifier;
             else
                 compat.push(mod.identifier, mod.id);
-            
+
             mod.downloads = 0;
             mod.likes = -2;
-            
+
             mods[mod.identifier] = mod;
         }
         available = mods;
@@ -88,14 +88,14 @@ exports.getAvailableMods = function (force) {
         }
         deferred.reject("Failed to load modlist data: " + errorThrown);
     });
-    
+
     return deferred.promise();
 };
 
 var deferInstalledMods;
 exports.getInstalledMods = function (context, force) {
     var localDeferInstalledMods = deferInstalledMods;
-    
+
     if(!localDeferInstalledMods) {
         deferInstalledMods = $.Deferred(function(defer) {
             process.nextTick(function() {
@@ -111,12 +111,12 @@ exports.getInstalledMods = function (context, force) {
             });
         })
         .promise();
-        
+
         localDeferInstalledMods = deferInstalledMods;
     }
-    
+
     var deferred = $.Deferred();
-    
+
     localDeferInstalledMods.done(function() {
         deferred.resolve(
             _.filter(
@@ -129,7 +129,7 @@ exports.getInstalledMods = function (context, force) {
     }).always(function() {
         deferInstalledMods = null;
     });
-    
+
     return deferred.promise();
 };
 
@@ -140,10 +140,10 @@ exports.groupByCategories = function(mods) {
         if (mods.hasOwnProperty(key)) {
             var mod = mods[key];
             count++;
-            
+
             if (!mod.category)
                 continue;
-            
+
             for (var i = 0; i < mod.category.length; i++) {
                 var category = mod.category[i].replace(" ", "-").toUpperCase();
                 if (categories[category] == null) {
@@ -165,13 +165,13 @@ exports.getPaths = function () {
 var getRequires = function(id, modpool) {
     var requires = {};
     requires[id] = id;
-    
+
     var _fillrequires = function(id, requires) {
         var mod = modpool[id];
         if(!mod) {
             throw "Mod '" + id + "' not found.";
         }
-        
+
         var dependencies = mod.dependencies;
         if(dependencies) {
             for(var i = 0; i < dependencies.length; ++i) {
@@ -183,10 +183,10 @@ var getRequires = function(id, modpool) {
             }
         }
     };
-    
+
     _fillrequires(id, requires);
     delete requires[id];
-    
+
     return _.toArray(requires);
 };
 
@@ -198,7 +198,7 @@ exports.getRequiredToInstall = getRequiredToInstall;
 var getRequiredBy = function(id) {
     requiredby = {};
     requiredby[id] = id;
-    
+
     var _fillrequiredby = function(id, requiredby) {
         for(var key in installed) {
             if (installed.hasOwnProperty(key)) {
@@ -212,10 +212,10 @@ var getRequiredBy = function(id) {
             }
         }
     }
-    
+
     _fillrequiredby(id, requiredby);
     delete requiredby[id];
-    
+
     return _.toArray(requiredby);
 };
 exports.getRequiredBy = getRequiredBy;
@@ -223,24 +223,24 @@ exports.getRequiredBy = getRequiredBy;
 exports.hasUpdate = function(id) {
     var mod = installed[id];
     var online = available[id];
-    
+
     if(!mod || !online) {
         return false;
     }
-    
+
     if(!semver.valid(mod.version) || !semver.valid(online.version)) {
         return mod.version !== online.version;
     }
-    
+
     return semver.lt(mod.version, online.version);
 };
 
 exports.install = function (id, callback, progressCallback) {
     var mod = available[id];
-    
+
     var ids = getRequires(id, available);
     ids.push(id);
-    
+
     var _finish = function(error, id) {
         _fixDependencies(installed);
         _updateFiles();
@@ -249,28 +249,28 @@ exports.install = function (id, callback, progressCallback) {
         if(callback)
             callback(error);
     }
-    
+
     var _install = function(ids, callback) {
         if(ids.length === 0) {
             _finish();
             return;
         }
-        
+
         var id = ids.shift();
         jsAddLogMessage("Installing mod '" + id + "'", 3)
-        
+
         var mod = available[id];
         var update = installed[id];
-        
+
         if(!mod) {
             var mod = update;
         }
-        
+
         var basename = id + "_v" + mod.version;
         var cachefile = path.join(paths.cache, basename + ".zip");
-        
+
         var installpath = update ? update.installpath : path.join(paths.mods[mod.context], id);
-        
+
         if(update && update.stockmod) {
             if(update.enabled === false) {
                 _enablemod(id, true);
@@ -281,7 +281,7 @@ exports.install = function (id, callback, progressCallback) {
             _install(ids, callback);
             return;
         }
-        
+
         if(fs.existsSync(installpath)) {
             var modinfopath = path.join(installpath, "modinfo.json");
             if(fs.existsSync(modinfopath)) {
@@ -298,10 +298,10 @@ exports.install = function (id, callback, progressCallback) {
                     return;
                 }
             }
-            
+
             rmdirRecurseSync(installpath);
         }
-        
+
         var _extract = function() {
             var modinfo = _uncompress(id, cachefile, installpath);
             if(!modinfo.context)
@@ -312,15 +312,15 @@ exports.install = function (id, callback, progressCallback) {
                 modinfo.priority = 100;
             modinfo.enabled = true;
             modinfo.installpath = installpath;
-            
+
             installed[id] = modinfo;
-            
+
             if(!devmode) {
                 $.post(URL_USAGE, { identifier: id, action: (update ? "update" : "install") });
                 mod.downloads++;
             }
         };
-        
+
         if(!fs.existsSync(cachefile)) {
             jsAddLogMessage("Downloading mod '" + id + "'", 3)
             jsDownload(mod.url, {
@@ -364,26 +364,26 @@ exports.install = function (id, callback, progressCallback) {
             _install(ids, callback);
         }
     };
-    
+
     _install(ids, callback);
 };
 
 var _uncompress = function(modid, zipfile, targetfolder) {
     var zipdata = fs.readFileSync(zipfile);
     var zip = new JSZip(zipdata);
-    
+
     // zip.folders not reliable, some directories are not detected as directory (eg. instant_sandbox zip)
-    
+
     // digging modinfo files
     modinfofiles = _.filter(zip.files, function(file) {
         var filepath = file.name;
         return path.basename(filepath) === 'modinfo.json'
     });
-    
+
     if(modinfofiles.length === 0) {
         throw "No modinfo.json found in this achive"
     }
-    
+
     var basepath;
     var modinfo;
     _.forEach(modinfofiles, function(modinfofile) {
@@ -395,26 +395,26 @@ var _uncompress = function(modid, zipfile, targetfolder) {
             return false;
         }
     });
-    
+
     if (basepath === undefined) {
         throw "Mod '" + modid + "' not found in this achive";
     }
-    
+
     var files = zip.files;
     if (basepath !== '') {
         files = _.filter(files, function(file) {
             return file.name.indexOf(basepath + '/') === 0;
         });
     }
-    
+
     if (!fs.existsSync(targetfolder))
         fs.mkdirSync(targetfolder);
-    
+
     for(var i in files) {
         var file = files[i];
-        
+
         var extractpath = path.join(targetfolder, file.name.substring(basepath.length));
-        
+
         if(file.name.indexOf('/', file.name.length - 1) !== -1) {
             if (fs.existsSync(extractpath))
                 continue;
@@ -424,7 +424,7 @@ var _uncompress = function(modid, zipfile, targetfolder) {
             fs.writeFileSync(extractpath, new Buffer(file.asUint8Array()));
         }
     }
-    
+
     return modinfo;
 };
 
@@ -436,11 +436,11 @@ exports.uninstall = function(id, callback) {
         _disablemod(id);
         rmdirRecurseSync(installpath);
         delete installed[id];
-        
+
         if(!devmode) {
             $.post(URL_USAGE, { identifier: id, action: "uninstall" });
         }
-        
+
         _updateFiles();
         callback();
     }
@@ -457,13 +457,13 @@ exports.setAllEnabled = function(enabled, context) {
     for(var key in installed) {
         if(isBuiltinMod(key))
             continue;
-        
+
         if (installed.hasOwnProperty(key)) {
             var mod = installed[key];
             try {
                 if(context && mod.context !== context)
                     continue;
-                
+
                 if(enabled) {
                     if(mod.enabled === false) {
                         ids = ids.concat(_enablemod(key));
@@ -484,10 +484,10 @@ exports.setAllEnabled = function(enabled, context) {
 
 var _enablemod = function(id, force) {
     var enabled = [];
-    
+
     var ids = getRequires(id, installed);
     ids.push(id);
-    
+
     for(var i = 0; i < ids.length; ++i) {
         var mod = installed[ids[i]];
         if(!mod && !force) {
@@ -495,10 +495,10 @@ var _enablemod = function(id, force) {
             return enabled;
         }
     }
-    
+
     for(var i = 0; i < ids.length; ++i) {
         var mod = installed[ids[i]];
-        
+
         if(mod && !mod.enabled) {
             jsAddLogMessage("Mod '" + mod.identifier + "' ENABLED", 3);
             enabled.push(mod.identifier);
@@ -510,16 +510,16 @@ var _enablemod = function(id, force) {
 
 var _disablemod = function(id) {
     var disabled = [];
-    
+
     if(isBuiltinMod(id))
         return disabled;
-    
+
     var ids = getRequiredBy(id);
     ids.push(id);
-    
+
     for(var i = 0; i < ids.length; ++i) {
         var mod = installed[ids[i]];
-        
+
         if(mod && mod.enabled) {
             jsAddLogMessage("Mod '" + mod.identifier + "' DISABLED", 3);
             disabled.push(mod.identifier);
@@ -539,7 +539,7 @@ var findInstalledMods = function() {
     var mods = {};
     var categories = {};
     var mounted = [PAMM_MOD_IDENTIFIER,PAMM_SERVER_MOD_IDENTIFIER];
-    
+
     // load mounted mods list (aka enabled mods)
     var _loadMountedMods = function(context) {
         var modsjsonpath = path.join(paths.mods[context], 'mods.json');
@@ -553,7 +553,7 @@ var findInstalledMods = function() {
     };
     _loadMountedMods('client');
     _loadMountedMods('server');
-    
+
     // load user mods
     var _loadUserMods = function(context) {
         var moddirs = fs.readdirSync(paths.mods[context]);
@@ -564,33 +564,33 @@ var findInstalledMods = function() {
                 try {
                     var modinfopath = path.join(moddir, 'modinfo.json');
                     var strmodinfo = fs.readFileSync(modinfopath, {encoding: 'utf8'});
-                    
+
                     var mod = {};
                     mod = JSON.parse(strmodinfo);
-                    
+
                     if(mod.enabled === false) {
                         // revert old modinfo updates, or mod packaging error
                         mod.enabled = true;
                         fs.writeFileSync(modinfopath, JSON.stringify(mod, null, 4), { encoding: 'utf8' });
                     }
-                    
+
                     if(mod.context !== context)
                         throw "invalid context property in modinfo"
-                    
+
                     if(mod.context === 'server' || !mod.id)
                         mod.id = mod.identifier;
                     else
                         compat.push(mod.identifier, mod.id)
-                    
+
                     if (mod.priority === undefined)
                         mod.priority = 100;
-                    
+
                     mod.enabled = (_.indexOf(mounted, mod.identifier) !== -1);
-                    
+
                     mod.installpath = moddir;
-                    
+
                     mods[mod.identifier] = mod;
-                    
+
                     var logid = mod.identifier === dirname ? mod.identifier : mod.identifier + " (/" + dirname + ")";
                     jsAddLogMessage("Found installed " + context + " mod: " + logid, 3)
                 } catch (err) {
@@ -601,7 +601,7 @@ var findInstalledMods = function() {
     };
     _loadUserMods('client');
     _loadUserMods('server');
-    
+
     // load stock mods
     if(pa.streams[stream]) {
         var _loadStockMods = function(context) {
@@ -614,11 +614,11 @@ var findInstalledMods = function() {
                     if (fs.statSync(moddir).isDirectory()) {
                         var modinfopath = moddir + '/modinfo.json';
                         var strmodinfo = fs.readFileSync(modinfopath, {encoding: 'utf8'});
-                        
+
                         var mod = {};
                         try {
                             mod = JSON.parse(strmodinfo);
-                            
+
                             if(mods[mod.identifier]) {
                                 jsAddLogMessage("Skipped " + context + " stock mod: " + mod.identifier, 3);
                                 continue;
@@ -626,16 +626,16 @@ var findInstalledMods = function() {
                             else {
                                 jsAddLogMessage("Found " + context + " stock mod: " + mod.identifier, 3);
                             }
-                            
+
                             mod.id = dirname;
-                            
+
                             if (mod.priority === undefined)
                                 mod.priority = 100;
-                            
+
                             mod.enabled = (_.indexOf(mounted, mod.identifier) !== -1);
-                            
+
                             mod.stockmod = true;
-                            
+
                             mods[mod.identifier] = mod;
                         } catch (err) {
                             var name = mod.display_name ? mod.display_name : dirname;
@@ -651,11 +651,11 @@ var findInstalledMods = function() {
         _loadStockMods('client');
         _loadStockMods('server');
     }
-    
+
     _fixDependencies(mods);
-    
+
     installed = mods;
-    
+
     _updateFiles();
 }
 
@@ -679,7 +679,7 @@ var _fixDependencies = function(mods) {
             }
             mod.dependencies = dependencies;
             delete mod.requires;
-            
+
             // rewrite modinfo.json if no mismatch ids
             if(!mismatch) {
                 var modinfopath = path.join(mod.installpath, "modinfo.json");
@@ -697,7 +697,7 @@ var _updateFiles = function(context) {
         _updateFiles('server');
         return;
     }
-    
+
     var enabledmods = _.sortBy(
         _.filter(
             _.toArray(installed)
@@ -705,10 +705,10 @@ var _updateFiles = function(context) {
         )
         ,function(mod) { return mod.priority }
     );
-    
+
     // mods/pamm/uimodlist
     jsAddLogMessage("Processing " + context + " scenes", 4);
-    
+
     var globalmodlist = [];
     var scenemodlist = {};
     var scenes = context === 'server' ? [] : ["armory", "building_planets", "connect_to_game", "game_over", "icon_atlas", "live_game", "live_game_econ", "live_game_hover", "load_planet", "lobby", "matchmaking", "new_game", "replay_browser", "server_browser", "settings", "social", "special_icon_atlas", "start", "system_editor", "transit"] // deprecated
@@ -718,7 +718,7 @@ var _updateFiles = function(context) {
         if(mod.global_mod_list) {
             globalmodlist = globalmodlist.concat(mod.global_mod_list);
         }
-        
+
         // deprecated scenes at modinfo root
         _.each(scenes, function(scene) {
             if(mod[scene]) {
@@ -727,7 +727,7 @@ var _updateFiles = function(context) {
                 scenemodlist[scene] = scenemodlist[scene].concat(mod[scene]);
             }
         });
-        
+
         // scenes
         if(mod.scenes) {
             _.each(mod.scenes, function(modlist, scene) {
@@ -742,28 +742,28 @@ var _updateFiles = function(context) {
             });
         }
     });
-    
+
     var pamm_path, uimodlist;
- 
-    var mount_order = _.pluck( enabledmods,'identifier'); // may be modified for server mods
-    
+
+    var mount_order = _.map( enabledmods,'identifier'); // may be modified for server mods
+
     switch ( context )
     {
-        
+
         case 'server':
-        
+
             pamm_path = paths.pamm_server;
-    
+
             // server version of ui_mod_list.js loads local client copy of ui_mod_list_for_server.js then merges server scenes into client scenes
-    
+
             uimodlist = "var global_server_mod_list = " + JSON.stringify(globalmodlist, null, 4) + ";\n\nvar scene_server_mod_list = " + JSON.stringify(scenemodlist, null, 4) + ";\n\ntry { \n\nloadScript('coui://ui/mods/ui_mod_list_for_server.js');\n\ntry { global_mod_list = _.union( global_mod_list, global_server_mod_list ) } catch (e) { console.log(e); } ;\n\ntry { _.forOwn( scene_server_mod_list, function( value, key ) { if ( scene_mod_list[ key ] ) { scene_mod_list[ key ] = _.union( scene_mod_list[ key ], value ) } else { scene_mod_list[ key ] = value } } ); } catch (e) { console.log(e); } \n\n\} catch (e) {\n\nconsole.log(e);\n\nvar global_mod_list = global_server_mod_list;\n\nvar scene_mod_list = scene_server_mod_list;\n\n}\n\n";
-    
+
             // for server mods we only enable the PA Server Mod Manager if there are other server mods enabled that use scenes
-    
+
             var sceneCount = globalmodlist.length + _.flatten( _.values( scenemodlist ) ).length;
-            
+
             jsAddLogMessage( 'Found ' + sceneCount + ' server mod scenes', 4);
-            
+
             if ( sceneCount == 0 )
             {
                 jsAddLogMessage( 'Disabling PA Server Mod Manager as not needed', 4);
@@ -771,25 +771,25 @@ var _updateFiles = function(context) {
             }
             else
             {
-                jsAddLogMessage( 'Enabling PA Server Mod Manager', 4);                
+                jsAddLogMessage( 'Enabling PA Server Mod Manager', 4);
             }
-    
+
             break;
-        
+
         case 'client':
-        
+
             pamm_path = paths.pamm;
-    
+
             uimodlist = "var global_mod_list = " + JSON.stringify(globalmodlist, null, 4) + ";\n\nvar scene_mod_list = " + JSON.stringify(scenemodlist, null, 4) + ";";
-    
+
             // extra copy of client ui_mod_list.js that can be loaded by server version of ui_mod_list.js for merging
-            
+
             fs.writeFileSync(
                 path.join(pamm_path, 'ui/mods/ui_mod_list_for_server.js' )
                 ,uimodlist
                 ,{ encoding: 'utf8' }
             );
-    
+
             // mods/pamm/modlist
             jsAddLogMessage("Writing mods_list.json", 4);
             fs.writeFileSync(
@@ -797,15 +797,15 @@ var _updateFiles = function(context) {
                 ,JSON.stringify(installed, null, 4)
                 ,{ encoding: 'utf8' }
             );
-        
+
             break;
-            
+
         default:
 
             jsAddLogMessage("Unknown context " + context, 4);
-        
+
     }
-    
+
 // some error checking
 
     if ( ! pamm_path )
@@ -822,13 +822,13 @@ var _updateFiles = function(context) {
             ,{ encoding: 'utf8' }
         );
     }
-    
+
     // mods/mods.json
-    
+
     jsAddLogMessage("Writing " + context + " mods.json", 4);
 
     var mods = { mount_order:mount_order };
-    
+
     fs.writeFileSync(
         path.join(pa.modspath[context], 'mods.json')
         ,JSON.stringify(mods, null, 4)
@@ -856,7 +856,7 @@ var setup = function(stream) {
     CreateFolderIfNotExists(strPammClientModDirectoryPath);
     CreateFolderIfNotExists(strPammClientModDirectoryPath + "/ui");
     CreateFolderIfNotExists(strPammClientModDirectoryPath + "/ui/mods");
-    
+
     var modinfo = {
         "context": "client",
         "identifier": PAMM_MOD_IDENTIFIER,
@@ -891,10 +891,10 @@ var setup = function(stream) {
 var initialize = function() {
     paths.cache = pa.cachepath;
     paths.mods = pa.modspath;
-    
+
     paths.pamm = path.join(pa.modspath.client, PAMM_MOD_ID);
     paths.pamm_server = path.join(pa.modspath.server, PAMM_SERVER_MOD_IDENTIFIER);
-    
+
     setup(pa.last);
 };
 

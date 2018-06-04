@@ -198,7 +198,7 @@
         <img id="downloading" src="assets/img/loading.gif">
       </div>
     </footer>
-    
+
     <div id="dialog-login" title="UberNet">
         <p class="ui-state-highlight"></p>
         <label for="name">Username</label>
@@ -206,12 +206,15 @@
         <label for="password">Password</label>
         <input type="password" name="password" id="password" value="" class="text ui-widget-content ui-corner-all">
     </div>
-    
-    <script>window.$ = window.jQuery = require('./assets/js/jquery-2.1.1.min.js');</script>
+	<script>
+		//no longer in assets
+		var $, jQuery;
+		$ = jQuery  = require('jquery');
+		var ko = require('knockout');
+		ko.mapping = require('knockout.mapping');
+	</script>
     <script src="assets/js/jquery-ajax-blob-arraybuffer.js"></script>
     <script src="assets/jquery-ui-1.11.0.custom/jquery-ui.min.js"></script>
-    <script src="assets/js/knockout-3.1.0.min.js"></script>
-    <script src="assets/js/knockout.mapping-2.4.1.min.js"></script>
 	<script src="assets/js/locale.js"></script>
     <script src="assets/js/resize.js"></script>
     <script src="assets/js/pamm.js"></script>

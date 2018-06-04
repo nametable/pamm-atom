@@ -1,16 +1,35 @@
 {
-  "name"    : "pamm-atom",
-  "author"  : "pamods",
-  "version" : "1.4.2",
-  "main"    : "main.js",
-  "bundledDependencies" : [
-    "semver"
-    ,"sprintf"
-    ,"jszip"
-    ,"lodash"
-    ,"mkdirp"
-  ],
-  "engines" : {
-    "atom-shell" : ">=0.13.2"
+  "name": "pamm-atom",
+  "version": "1.5.0",
+  "description": "Mod manager for Planetary Annihilation Titans & Classic",
+  "main": "main.js",
+  "dependencies": {
+    "jquery": "^3.3.1",
+    "jszip": "^2.2.2",
+    "knockout": "^3.4.2",
+    "knockout.mapping": "^2.4.3",
+    "lodash": "^4.17.10",
+    "mkdirp": "^0.5.0",
+    "semver": "^2.3.0",
+    "sprintf-js": "^1.1.1"
+  },
+  "devDependencies": {
+    "electron": "^2.0.2"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/flubbateios/pamm-atom.git"
+  },
+  "author": "pamods",
+  "license": "UNLICENSED",
+  "bugs": {
+    "url": "https://github.com/flubbateios/pamm-atom/issues"
+  },
+  "homepage": "https://github.com/flubbateios/pamm-atom#readme",
+  "engines": {
+    "electron": ">=2.0.2"
   }
 }

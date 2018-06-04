@@ -1,7 +1,7 @@
 $(function() {
-    var remote = require('remote');
+    var remote = require('electron').remote;
     var _ = require('lodash');
-    
+
     // restore previous window size
     try {
         if(localStorage.pamm_resize !== "disabled" && localStorage.pamm_screenSize) {
@@ -14,7 +14,7 @@ $(function() {
     } catch(error) {
         console.log('ERROR: ' + error);
     }
-    
+
     // remember size
     var remembersize = function() {
         try {
