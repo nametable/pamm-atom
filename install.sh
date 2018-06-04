@@ -112,6 +112,13 @@ if [ $? -gt 0 ]; then
     exit 1
 fi
 
+echo "Extracting node_modules..."
+unzip -q -u "$WORKINGDIR/pamm-atom-master/node_modules.zip" -d "$APPDIR"
+if [ $? -gt 0 ]; then
+    echo "ERROR!"
+    exit 1
+fi
+
 echo "Cleaning up tmp files..."
 rm -rf "$WORKINGDIR"
 
