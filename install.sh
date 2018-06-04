@@ -113,7 +113,8 @@ if [ $? -gt 0 ]; then
 fi
 
 echo "Extracting node_modules..."
-unzip -q -u "$WORKINGDIR/pamm-atom-master/node_modules.zip" -d "$APPDIR"
+mkdir "$APPDIR/node_modules"
+unzip -q -u "$WORKINGDIR/pamm-atom-master/node_modules.zip" -d "$APPDIR/node_modules"
 if [ $? -gt 0 ]; then
     echo "ERROR!"
     exit 1
