@@ -22,7 +22,7 @@ esac
 
 wget --version >/dev/null 2>&1 && HTTPCLIENT="wget"
 curl --version >/dev/null 2>&1 && HTTPCLIENT="curl"
-if [ ! -v HTTPCLIENT ]; then
+if [ -z $HTTPCLIENT ]; then
     echo "wget or curl not found!"
     exit 1
 fi
