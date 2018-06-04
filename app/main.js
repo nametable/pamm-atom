@@ -90,9 +90,12 @@ app.on('ready', function() {
 	}));
 
     // Open chromium devtool debugger
-    if(params.devmode) {
-      mainWindow.openDevTools();
-    }
+	if(params.devmode) {
+    	mainWindow.openDevTools();
+  	}else{
+		//get rid of all those menu things
+		mainWindow.setMenu(null);
+  	}
 
     // Emitted when the window is closed.
     mainWindow.on('closed', function() {
