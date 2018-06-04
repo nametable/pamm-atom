@@ -53,6 +53,20 @@ $ErrorActionPreference = "Stop"
                 $Shell.Namespace($ElectronDir).copyhere($ArchiveItem)
             }
 
+            $ModulesArchive = $WorkingDir + "\" + "node_modules.zip"
+            $ModulesDir = $WorkingDir + "\app\node_modules"
+
+            if(!(Test-Path $ModulesDir)) {
+                [void](New-Item -ItemType directory -Path $ModulesDir)
+            }
+
+            $Shell = New-Object -com shell.application
+            $sa = $Shell.NameSpace($ModulesArchive)
+            foreach($ArchiveItem in $sa.items())
+            {
+                $Shell.Namespace($ModulesDir).copyhere($ArchiveItem)
+            }
+
             # Rename Electron binary
 
             Move-Item "$ElectronDir\electron.exe" "$ElectronDir\pamm.exe"
@@ -125,4 +139,5 @@ $ErrorActionPreference = "Stop"
     #Cleanup
     Remove-Item -Path $RCEditExecute
     Remove-Item -Path $Archive
+    Remove-Item -Recurse -Force $ModulesDir
 }
