@@ -10,9 +10,9 @@ linux*)
     ;;
 darwin*)
     PLATFORM="darwin"
-    PAMMDIR="$HOME/Library/Application Support/Uber Entertainment/Planetary Annihilation/pamm"
-    #PAMMDIR="$WORKINGDIR/tmp/pamm"
-    APPDIR="$PAMMDIR/Atom.app/Contents/Resources/app"
+#    PAMMDIR="$HOME/Library/Application Support/Uber Entertainment/Planetary Annihilation/pamm"
+    PAMMDIR="$HOME/Desktop/pamm"
+    APPDIR="$PAMMDIR/Electron.app/Contents/Resources/app"
     ;;
 *)
     echo Unsupported platform: $OSTYPE
@@ -22,7 +22,7 @@ esac
 
 wget --version >/dev/null 2>&1 && HTTPCLIENT="wget"
 curl --version >/dev/null 2>&1 && HTTPCLIENT="curl"
-if [ ! -v HTTPCLIENT ]; then
+if [ -z $HTTPCLIENT ]; then
     echo "wget or curl not found!"
     exit 1
 fi
@@ -31,8 +31,8 @@ mkdir $WORKINGDIR
 
 echo "Downloading latest PAMM release..."
 
-LATEST_PAMM_URL=https://github.com/pamods/pamm-atom/archive/stable.zip
-PAMM_ARCHIVE=$WORKINGDIR/stable.zip
+LATEST_PAMM_URL="https://github.com/flubbateios/pamm-atom/archive/master.zip"
+PAMM_ARCHIVE="$WORKINGDIR/stable.zip"
 
 if [ $HTTPCLIENT == "wget" ]; then
     wget "$LATEST_PAMM_URL" -O "$PAMM_ARCHIVE"
@@ -45,9 +45,9 @@ if [ $? -gt 0 ]; then
     exit 1
 fi
 
-echo "Find latest Atom Shell release..."
+echo "Find latest Electron release..."
 
-LATEST_ATOM_URL=https://github.com/atom/electron/releases/tag/v0.19.5
+LATEST_ATOM_URL="https://github.com/electron/electron/releases/latest"
 
 if [ $HTTPCLIENT == "wget" ]; then
     HTML=`wget -qO- $LATEST_ATOM_URL`
@@ -60,8 +60,15 @@ if [ $? -gt 0 ]; then
     exit 1
 fi
 
-ATOM_ARCHIVE_URL=`echo $HTML | egrep -o "/atom/electron/releases/download/[^\"]+-$PLATFORM-x64.zip" | head -1`
+ATOM_ARCHIVE_URL=`echo $HTML | egrep -o "/electron/electron/releases/download/v[^\"]*/electron-v[^\"]*-$PLATFORM-x64.zip" | head -1`
+
+if [ -z $ATOM_ARCHIVE_URL ]; then
+    echo "Unable to extract link to electron from GitHub release"
+    exit 1
+fi
+
 ATOM_ARCHIVE_URL="https://github.com$ATOM_ARCHIVE_URL"
+
 
 ATOM_ARCHIVE=`echo $ATOM_ARCHIVE_URL | sed -E 's/.+\/(.+)/\1/'`
 ATOM_ARCHIVE="$WORKINGDIR/$ATOM_ARCHIVE"
@@ -69,7 +76,7 @@ ATOM_ARCHIVE="$WORKINGDIR/$ATOM_ARCHIVE"
 rm -rf "$PAMMDIR"
 mkdir -p "$PAMMDIR"
 
-echo "Downloading Atom Shell..."
+echo "Downloading Electron..."
 echo "  from: $ATOM_ARCHIVE_URL"
 echo "  to: $ATOM_ARCHIVE"
 
@@ -84,7 +91,7 @@ if [ $? -gt 0 ]; then
     exit 1
 fi
 
-echo "Extracting Atom Shell..."
+echo "Extracting Electron..."
 unzip -q -u "$ATOM_ARCHIVE" -d "$PAMMDIR"
 if [ $? -gt 0 ]; then
     echo "ERROR!"
@@ -99,7 +106,15 @@ if [ $? -gt 0 ]; then
 fi
 
 echo "Copying PAMM module..."
-cp -R "$WORKINGDIR/pamm-atom-stable/app" "$APPDIR"
+cp -R "$WORKINGDIR/pamm-atom-master/app" "$APPDIR"
+if [ $? -gt 0 ]; then
+    echo "ERROR!"
+    exit 1
+fi
+
+echo "Extracting node_modules..."
+mkdir "$APPDIR/node_modules"
+unzip -q -u "$WORKINGDIR/pamm-atom-master/node_modules.zip" -d "$APPDIR/node_modules"
 if [ $? -gt 0 ]; then
     echo "ERROR!"
     exit 1
@@ -108,9 +123,11 @@ fi
 echo "Cleaning up tmp files..."
 rm -rf "$WORKINGDIR"
 
+echo "Installed in $APPDIR"
+
 case $OSTYPE in
 linux*)
-    mv "$PAMMDIR/atom" "$PAMMDIR/pamm"
+    mv "$PAMMDIR/electron" "$PAMMDIR/pamm"
 
     # try to create desktop shortcut & protocol handler
     cat >$HOME/.local/share/applications/pamm.desktop <<EOL
@@ -123,19 +140,19 @@ Exec=$PAMMDIR/pamm "%u"
 Icon=$PAMMDIR/resources/app/assets/img/pamm.png
 MimeType=x-scheme-handler/pamm;
 EOL
-    update-desktop-database ~/.local/share/applications
+    # update-desktop-database does not exist anymore, but keep it for distros that still use it
+    which update-desktop-database > /dev/null
+    if [ $? -eq 0 ]; then
+        update-desktop-database ~/.local/share/applications
+    fi
 
     echo "PAMM has been successfully installed."
     echo "  => $PAMMDIR"
     $PAMMDIR/pamm
     ;;
 darwin*)
-    #mv "$PAMMDIR/Atom.app/Contents/MacOS/Atom" "$PAMMDIR/Atom.app/Contents/MacOS/PAMM"
-    mv "$PAMMDIR/Atom.app" "$PAMMDIR/PAMM.app"
+    mv "$PAMMDIR/Electron.app" "$PAMMDIR/PAMM.app"
     open "$PAMMDIR/PAMM.app"
     echo "PAMM has been successfully installed."
     ;;
 esac
-
-
-

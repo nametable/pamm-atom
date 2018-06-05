@@ -1,9 +1,11 @@
-﻿var strLocales = [
-	"en", 
+
+var strLocales = [
+	"en",
 	"fr",
 	"nl",
-	"de"];
-	
+	"de"
+];
+
 var strlocaleText = {
 	"MOD_MANAGER": {
 		"en": "MOD MANAGER",
@@ -97,9 +99,21 @@ var strlocaleText = {
 	},
 	"install": {
 		"en": "install",
-		"fr": "",
-		"nl": "",
-		"de": ""
+		"fr": "installer",
+		"nl": "installeren",
+		"de": "etwas installieren"
+	},
+	"titans only": {
+		"en": "titans only",
+		"fr": "seul titans",
+		"nl": "alleen voor titans",
+		"de": "nur titans"
+	},
+	"classic only": {
+		"en": "classic only",
+		"fr": "seul classic",
+		"nl": "alleen voor classic",
+		"de": "nur classic"
 	},
 	"update": {
 		"en": "update",
@@ -476,12 +490,12 @@ var strlocaleText = {
 };
 
 var strLocaleTextItems = [
-	"MOD_MANAGER", 
+	"MOD_MANAGER",
 	"NEWS",
 	"INSTALLED_MODS",
 	"AVAILABLE_MODS",
 	"Launch_PA",
-    "Launch_PA_NOMODS",
+	"Launch_PA_NOMODS",
 	"Refresh",
 	"Exit",
 	"Version",
@@ -507,7 +521,7 @@ var strLocaleTextItems = [
 	"AUTHOR",
 	"BUILD",
 	"DOWNLOADS",
-    "POPULARITY",
+	"POPULARITY",
 	"LIKES",
 	"RANDOM",
 	"LOG",
@@ -550,4 +564,5 @@ var strLocaleTextItems = [
 	"Mod_list_generator_created_by",
 	"Thanks_also",
 	"and",
-	"Requires_Refresh"];
+	"Requires_Refresh"
+];
