@@ -263,8 +263,8 @@ exports.install = function(id, callback, progressCallback) {
 
 		var basename = id + "_v" + mod.version;
 		var cachefile = path.join(paths.cache, basename + ".zip");
-
-		var installpath = update ? update.installpath : path.join(paths.mods[mod.context], id);
+		var installpath_folder = id.toLowerCase();
+		var installpath = update ? update.installpath : path.join(paths.mods[mod.context], installpath_folder);
 
 		if (update && update.stockmod) {
 			if (update.enabled === false) {
