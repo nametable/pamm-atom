@@ -5,7 +5,7 @@ var pa = require('./pa.js');
 var compat = require('./pamm-compat.js');
 
 var URL_MODLIST = "https://flubbateios.com/pamm/api/mods";
-var URL_USAGE = "http://pamm-mereth.rhcloud.com/api/usage";
+//var URL_USAGE = "http://pamm-mereth.rhcloud.com/api/usage";
 
 var PAMM_MOD_ID = "PAMM";
 var PAMM_MOD_IDENTIFIER = "com.pa.pamods.dpamm";
@@ -54,7 +54,7 @@ exports.getAvailableMods = function(force) {
 		_finish();
 
 	var prmModlist = jsDownload(URL_MODLIST);
-	var prmModcount = jsDownload(URL_USAGE);
+	//var prmModcount = jsDownload(URL_USAGE);
 
 	prmModlist.done(function(data) {
 			var modlist;

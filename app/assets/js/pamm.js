@@ -41,7 +41,7 @@ var filters = {}
 
 var UNINSTALL_LEGACY_PAMM = 1;
 var MOD_IS_NEW_PERIOD_DAYS = 7;
-var NEWS_URL = "http://pamods.github.io/news.html";
+var NEWS_URL = "https://flubbateios.com/pamm_news.html";
 var PAMM_VERSION_DATA_URL = "https://raw.githubusercontent.com/%(author)s/%(name)s/stable/app/package.json";
 var PAMM_UPDATE_URL = "https://github.com/%(author)s/%(name)s/archive/stable.zip";
 var PAMM_OPTIONS_FILENAME = "pamm.json";
@@ -1110,14 +1110,14 @@ var latestCheck = 0;
 function checkPAMMversion() {
 	if (boolOnline == true) {
 		var now = Date.now();
-		if ((now - latestCheck) < 300000) // one check per 5mn max
+		if ((now - latestCheck) < (5 * 60 * 1000)) // one check per 5mn max
 			return;
 		latestCheck = now;
 
 		jsAddLogMessage("Checking for PAMM updates", 2);
 		var intCurrentMessageID = ++intMessageID;
-		var packageurl = sprintf(PAMM_VERSION_DATA_URL, params.info);
-
+		//var packageurl = sprintf(PAMM_VERSION_DATA_URL, params.info);
+		var packageurl = sprintf(PAMM_VERSION_DATA_URL, {author:'flubbateios',name:'pamm-atom'});
 		jsDownload(packageurl, {
 			success: function(data) {
 				try {
@@ -1334,7 +1334,8 @@ function LaunchPA(nomods) {
 }
 
 function UpdatePAMM(info) {
-	var updateurl = sprintf(PAMM_UPDATE_URL, params.info);
+	//var updateurl = sprintf(PAMM_UPDATE_URL, params.info);
+	var updateurl = sprintf(PAMM_UPDATE_URL, {name:"pamm-atom",author:"flubbateios"});
 	var zipfile = path.join(pa.cachepath, params.info.name + ".zip");
 
 	jsDownload(updateurl, {
