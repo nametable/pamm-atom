@@ -16,6 +16,6 @@ $RECYCLE.BIN/
 .DS_Store
 
 #node_modules DIRECTORY for testing
-./node_modules
+*/node_modules
 
 #############
