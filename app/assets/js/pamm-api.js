@@ -5,7 +5,6 @@ var pa = require('./pa.js');
 var compat = require('./pamm-compat.js');
 
 var URL_MODLIST = "https://flubbateios.com/pamm/api/mods";
-//var URL_USAGE = "http://pamm-mereth.rhcloud.com/api/usage";
 
 var PAMM_MOD_ID = "PAMM";
 var PAMM_MOD_IDENTIFIER = "com.pa.pamods.pamm";
@@ -50,7 +49,6 @@ exports.getAvailableMods = function(force) {
 		_finish();
 
 	var prmModlist = jsDownload(URL_MODLIST);
-	//var prmModcount = jsDownload(URL_USAGE);
 
 	prmModlist.done(function(data) {
 			var modlist;
@@ -311,14 +309,6 @@ exports.install = function(id, callback, progressCallback) {
 			modinfo.installpath = installpath;
 
 			installed[id] = modinfo;
-
-			if (!devmode) {
-				$.post(URL_USAGE, {
-					identifier: id,
-					action: (update ? "update" : "install")
-				});
-				mod.downloads++;
-			}
 		};
 
 		if (!fs.existsSync(cachefile)) {
@@ -431,13 +421,6 @@ exports.uninstall = function(id, callback) {
 		_disablemod(id);
 		rmdirRecurseSync(installpath);
 		delete installed[id];
-
-		if (!devmode) {
-			$.post(URL_USAGE, {
-				identifier: id,
-				action: "uninstall"
-			});
-		}
 
 		_updateFiles();
 		callback();
