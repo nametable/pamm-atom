@@ -8,12 +8,8 @@ var URL_MODLIST = "https://flubbateios.com/pamm/api/mods";
 //var URL_USAGE = "http://pamm-mereth.rhcloud.com/api/usage";
 
 var PAMM_MOD_ID = "PAMM";
-var PAMM_MOD_IDENTIFIER = "com.pa.pamods.dpamm";
+var PAMM_MOD_IDENTIFIER = "com.pa.pamods.pamm";
 var PAMM_SERVER_MOD_IDENTIFIER = "com.pa.pamm.server";
-if (process.platform === 'win32') {
-	PAMM_MOD_ID = "rPAMM";
-	PAMM_MOD_IDENTIFIER = "com.pa.pamods.rpamm";
-}
 
 var stream = pa.last ? pa.last.stream : 'stable';
 
