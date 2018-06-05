@@ -868,7 +868,7 @@ function jsPreInstallMod(strModID) {
 }
 
 function jsPreUninstallMod(strModID) {
-	var boolConfirm = confirm("Are you sure you want to uninstall '" + jsGetInstalledMod(strModID).display_name + "'?");
+	var boolConfirm = confirm("Are you sure you want to uninstall '" + jsGetInstalledMod(strModID).display_name + "'? If this is a local mod (not downloaded from the available mods tab), it will be deleted forever.");
 
 	if (boolConfirm == true) {
 		pamm.uninstall(strModID, function() {
