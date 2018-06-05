@@ -895,7 +895,7 @@ var initialize = function() {
 	paths.cache = pa.cachepath;
 	paths.mods = pa.modspath;
 
-	paths.pamm = path.join(pa.modspath.client, PAMM_MOD_ID);
+	paths.pamm = path.join(pa.modspath.client, PAMM_MOD_IDENTIFIER);
 	paths.pamm_server = path.join(pa.modspath.server, PAMM_SERVER_MOD_IDENTIFIER);
 
 	setup(pa.last);
