@@ -12,10 +12,14 @@ This is a port of the Windows version which already uses an HTML engine.
 Download this project and uncompress it : 
 https://github.com/pamods/pamm-atom/archive/stable.zip
 
-Windows x64 users should run the install.bat file located in the root of this project. 
+Windows should run the install.bat file located in the root of this project. 
 This will install PAMM into your PA user data, create a desktop shortcut, and launch PAMM.
 
-For other systems:
+Mac/Linux users should use install.sh
+
+You must have a 64 bit system for the installation scripts; you would be crazy to play PA on a 32 bit system.
+
+##Manual install
 
 Download the electron release for your platform and uncompress it: 
 https://github.com/electron/electron/releases
@@ -40,4 +44,14 @@ electron/resources/app
 └── index.html
 ```
 
-Then execute `Electron.app` (or `electron` on Linux, and `electron.exe` on Windows), and Electron will start PAMM.
+You must then install the dependencies of PAMM. If you have node installed, just do npm install --production in the directory with package.json in it. If you do not, we've already prepared a zip with node_modules. Just unzip that so that your directory structure looks like this.
+
+```text
+electron/resources/app or electron/Electron.app/Contents/Resources/app/
+├── node_modules
+├── package.json
+├── main.js
+└── index.html
+```
+
+Then execute `Electron.exe` , `Electron.app` or `Electron` depending on your OS and Electron will start PAMM.
