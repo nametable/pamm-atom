@@ -364,27 +364,37 @@ function jsGenerateModEntryHTML(objMod, boolIsInstalled) {
 
 	/* metrics */
 	if (modOnline) {
-		/* Install Count */
+		/* Install Count
 		if (modOnline.downloads) {
 			strHTML_downloads = "<img src='assets/img/download.png' style='position: absolute; margin-top:4px'> <div class='mod_entry_count'>" + modOnline.downloads + "</div>"; //TODO: Fix Up
 		}
-
-		/* Like Count */
+		*/
+		/* Like Count
 		if (settings.modlikes() == true) {
 			if (modOnline.likes != null) {
 				if (modOnline.likes == -2) {
-					strHTML_likes = "<span id='" + id + "_like_count' class='mod_entry_likes'>" + jsGetLocaleText('Loading') + "</span>" //TODO: Fix Up
+					//strHTML_likes = "<span id='" + id + "_like_count' class='mod_entry_likes'>" + jsGetLocaleText('Loading') + "</span>"
+					//No mod likes at the moment
+					strHTML_likes = "";
 				}
 				if (modOnline.likes >= 0) {
 					strHTML_likes = "<img src='assets/img/like.png' height='15' width='15' style='position: absolute; margin-top:4px; margin-left: 8px;'> <div class='mod_entry_likes'>" + modOnline.likes + "</div>"; //TODO: Fix Up
 				}
 			}
 		}
+		*/
 	}
 
 	/* install/update/uninstall links */
 	if (!modInstalled) {
-		strHTML_install_link = "<div class='mod_entry_link mod_entry_install_link'>[ <a href='#' data-action='install'>" + jsGetLocaleText('install') + "</a> ]</div>";
+		var usingTitans = pa.last.titans;
+		if((objMod.titansOnly && usingTitans) || (objMod.classicOnly && (!usingTitans)) || (objMod.titansOnly == undefined && objMod.classicOnly == undefined)){
+			strHTML_install_link = "<div class='mod_entry_link mod_entry_install_link'>[ <a href='#' data-action='install'>" + jsGetLocaleText('install') + "</a> ]</div>";
+		}else{
+			var classicOrTitansTxt = usingTitans ? "classic" : "titans";
+			strHTML_install_link = "<div class='mod_entry_link mod_entry_install_link'>[ " + jsGetLocaleText(classicOrTitansTxt + " only") + "]</div>";
+		}
+
 
 		// filter classe
 		strHTML_classes = strHTML_classes.replace('mod_entry', 'mod_entry mod_entry_filter_not_installed');
@@ -464,9 +474,6 @@ function jsGenerateOnlineModsListHTML() {
 		"<a href='#' id='filter_area_sort_last_title' onClick='jsSetAvailableModsSort(\"TITLE\")'>" + jsGetLocaleText('TITLE') + "</a> - " +
 		"<a href='#' id='filter_area_sort_last_author' onClick='jsSetAvailableModsSort(\"AUTHOR\")'>" + jsGetLocaleText('AUTHOR') + "</a> - " +
 		"<a href='#' id='filter_area_sort_last_build' onClick='jsSetAvailableModsSort(\"BUILD\")'>" + jsGetLocaleText('BUILD') + "</a> - " +
-		"<a href='#' id='filter_area_sort_last_downloads' onClick='jsSetAvailableModsSort(\"DOWNLOADS\")'>" + jsGetLocaleText('DOWNLOADS') + "</a> - " +
-		"<a href='#' id='filter_area_sort_last_popularity' onClick='jsSetAvailableModsSort(\"POPULARITY\")'>" + jsGetLocaleText('POPULARITY') + "</a> - " +
-		(settings.modlikes() ? "<a href='#' id='filter_area_sort_last_likes' onClick='jsSetAvailableModsSort(\"LIKES\")'>" + jsGetLocaleText('LIKES') + "</a> - " : "") +
 		"<a href='#' id='filter_area_sort_last_random' onClick='jsSetAvailableModsSort(\"RANDOM\")'>" + jsGetLocaleText('RANDOM') + "</a>" +
 		"</td>" +
 		"</tr>" +

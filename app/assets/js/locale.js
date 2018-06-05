@@ -99,9 +99,21 @@ var strlocaleText = {
 	},
 	"install": {
 		"en": "install",
-		"fr": "",
-		"nl": "",
-		"de": ""
+		"fr": "installer",
+		"nl": "installeren",
+		"de": "etwas installieren"
+	},
+	"titans only": {
+		"en": "titans only",
+		"fr": "seul titans",
+		"nl": "alleen voor titans",
+		"de": "nur titans"
+	},
+	"classic only": {
+		"en": "classic only",
+		"fr": "seul classic",
+		"nl": "alleen voor classic",
+		"de": "nur classic"
 	},
 	"update": {
 		"en": "update",
