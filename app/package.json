@@ -1,6 +1,6 @@
 {
   "name": "pamm-atom",
-  "version": "1.5.1",
+  "version": "1.5.0",
   "description": "Mod manager for Planetary Annihilation Titans & Classic",
   "main": "main.js",
   "dependencies": {

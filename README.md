@@ -1,11 +1,5 @@
 # PA Mod Manager (electron edition)
 
-## Privacy Notice
-
-PAMM downloads mods and icons from external sources. Your IP could be collected by any of those servers. You are using PAMM at your own risk!
-
-## History
-
 Original Windows version : https://forums.uberent.com/threads/rel-pa-mod-manager-v4-0-3.50726/
 
 Original Linux and Mac OS X version : https://forums.uberent.com/threads/rel-raevns-pa-mod-manager-for-linux-and-mac-os-x-version-4-0-2.50958/
