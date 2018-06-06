@@ -114,7 +114,7 @@ function createStreamObject(paPath, osxapp) {
 
 	var stockmodspath = path.join(resourcesPath, '/media/stockmods');
 
-	var titans = paPath.indexOf('Planetary Annihilation Titans') != -1;
+	var titans = fs.existsSync(path.join(paPath,'media/pa_ex1'));
 
 	var steam = paPath.toLowerCase().indexOf('steamapps') != -1;
 	var uberLauncher = !steam;
