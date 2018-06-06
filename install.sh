@@ -1,23 +1,29 @@
-#!/bin/bash
+#!/bin/sh
 
-WORKINGDIR=/tmp/pamm_$RANDOM
+WORKINGDIR=/tmp/pamm
+
+# OSTYPE maybe not be defined for /bin/sh
+if [ -z $OSTYPE ]; then
+    OSTYPE=$(uname | tr [:upper:] [:lower:])
+fi
 
 case $OSTYPE in
-linux*)
-    PLATFORM="linux"
-    PAMMDIR="$HOME/.local/pamm"
-    APPDIR="$PAMMDIR/resources/app"
-    ;;
-darwin*)
-    PLATFORM="darwin"
-#    PAMMDIR="$HOME/Library/Application Support/Uber Entertainment/Planetary Annihilation/pamm"
-    PAMMDIR="$HOME/Desktop/pamm"
-    APPDIR="$PAMMDIR/Electron.app/Contents/Resources/app"
-    ;;
-*)
-    echo Unsupported platform: $OSTYPE
-    exit 1
-    ;;
+    linux*)
+        PLATFORM="linux"
+        [ -z "${XDG_DATA_HOME}" ] && XDG_DATA_HOME="${HOME}/.local/share"
+        PAMMDIR="${XDG_DATA_HOME}/pamm"
+        APPDIR="$PAMMDIR/resources/app"
+        ;;
+    darwin*)
+        PLATFORM="darwin"
+        # PAMMDIR="$HOME/Library/Application Support/Uber Entertainment/Planetary Annihilation/pamm"
+        PAMMDIR="$HOME/Desktop/pamm"
+        APPDIR="$PAMMDIR/Electron.app/Contents/Resources/app"
+        ;;
+    *)
+        echo Unsupported platform: $OSTYPE
+        exit 1
+        ;;
 esac
 
 wget --version >/dev/null 2>&1 && HTTPCLIENT="wget"
@@ -34,7 +40,7 @@ echo "Downloading latest PAMM release..."
 LATEST_PAMM_URL="https://github.com/flubbateios/pamm-atom/archive/master.zip"
 PAMM_ARCHIVE="$WORKINGDIR/stable.zip"
 
-if [ $HTTPCLIENT == "wget" ]; then
+if [ $HTTPCLIENT = "wget" ]; then
     wget "$LATEST_PAMM_URL" -O "$PAMM_ARCHIVE"
 else
     curl -L "$LATEST_PAMM_URL" -o "$PAMM_ARCHIVE"
@@ -49,7 +55,7 @@ echo "Find latest Electron release..."
 
 LATEST_ATOM_URL="https://github.com/electron/electron/releases/latest"
 
-if [ $HTTPCLIENT == "wget" ]; then
+if [ $HTTPCLIENT = "wget" ]; then
     HTML=`wget -qO- $LATEST_ATOM_URL`
 else
     HTML=`curl -L $LATEST_ATOM_URL`
@@ -80,7 +86,7 @@ echo "Downloading Electron..."
 echo "  from: $ATOM_ARCHIVE_URL"
 echo "  to: $ATOM_ARCHIVE"
 
-if [ $HTTPCLIENT == "wget" ]; then
+if [ $HTTPCLIENT = "wget" ]; then
     wget "$ATOM_ARCHIVE_URL" -O "$ATOM_ARCHIVE"
 else
     curl -L "$ATOM_ARCHIVE_URL" -o "$ATOM_ARCHIVE"
@@ -125,34 +131,35 @@ rm -rf "$WORKINGDIR"
 
 echo "Installed in $APPDIR"
 
-case $OSTYPE in
-linux*)
-    mv "$PAMMDIR/electron" "$PAMMDIR/pamm"
+case $PLATFORM in
+    linux)
+        mv "$PAMMDIR/electron" "$PAMMDIR/pamm"
 
-    # try to create desktop shortcut & protocol handler
-    cat >$HOME/.local/share/applications/pamm.desktop <<EOL
-[Desktop Entry]
-Version=1.0
-Type=Application
-Name=PAMM
-Comment=PA Mod Manager
-Exec=$PAMMDIR/pamm "%u"
-Icon=$PAMMDIR/resources/app/assets/img/pamm.png
-MimeType=x-scheme-handler/pamm;
+        # try to create desktop shortcut & protocol handler
+        cat > ${XDG_DATA_HOME}/applications/pamm.desktop <<-EOL
+        [Desktop Entry]
+        Version=1.0
+        Type=Application
+        Name=PAMM
+        Comment=PA Mod Manager
+        Exec=$PAMMDIR/pamm "%u"
+        Icon=$PAMMDIR/resources/app/assets/img/pamm.png
+        MimeType=x-scheme-handler/pamm;
 EOL
-    # update-desktop-database does not exist anymore, but keep it for distros that still use it
-    which update-desktop-database > /dev/null
-    if [ $? -eq 0 ]; then
-        update-desktop-database ~/.local/share/applications
-    fi
 
-    echo "PAMM has been successfully installed."
-    echo "  => $PAMMDIR"
-    $PAMMDIR/pamm
-    ;;
-darwin*)
-    mv "$PAMMDIR/Electron.app" "$PAMMDIR/PAMM.app"
-    open "$PAMMDIR/PAMM.app"
-    echo "PAMM has been successfully installed."
-    ;;
+        # update-desktop-database does not exist anymore, but keep it for distros that still use it
+        which update-desktop-database > /dev/null
+        if [ $? -eq 0 ]; then
+            update-desktop-database ${XDG_DATA_HOME}/applications
+        fi
+
+        echo "PAMM has been successfully installed."
+        echo "  => $PAMMDIR"
+        $PAMMDIR/pamm
+        ;;
+    darwin)
+        mv "$PAMMDIR/Electron.app" "$PAMMDIR/PAMM.app"
+        open "$PAMMDIR/PAMM.app"
+        echo "PAMM has been successfully installed."
+        ;;
 esac
