@@ -1,6 +1,21 @@
 // Electron modules
 // var for consistency with the rest of the project
 var {app,BrowserWindow,dialog,ipcMain} = require('electron');
+//checking nodejs modules here
+try{
+	require('semver');
+}catch(e){
+	app.on('ready', () => {
+			dialog.showMessageBox({
+			title:"error!",
+			type:"info",
+			message:"Dependencies are missing. Please re-run the installer"
+		},() => {
+			app.quit();
+		})
+	})
+	
+}
 // Node.js modules
 var fs = require('fs');
 var path = require('path');
