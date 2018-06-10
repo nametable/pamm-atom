@@ -388,7 +388,7 @@ function jsGenerateModEntryHTML(objMod, boolIsInstalled) {
 	/* install/update/uninstall links */
 	if (!modInstalled) {
 		var usingTitans = pa.last.titans;
-		if((objMod.titansOnly && usingTitans) || (objMod.classicOnly && (!usingTitans)) || (objMod.titansOnly == undefined && objMod.classicOnly == undefined)){
+		if((objMod.titansOnly && usingTitans) || (objMod.classicOnly && (!usingTitans)) || (!objMod.titansOnly && !objMod.classicOnly)){
 			strHTML_install_link = "<div class='mod_entry_link mod_entry_install_link'>[ <a href='#' data-action='install'>" + jsGetLocaleText('install') + "</a> ]</div>";
 		}else{
 			var classicOrTitansTxt = usingTitans ? "classic" : "titans";
