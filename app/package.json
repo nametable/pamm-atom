@@ -4,13 +4,14 @@
   "description": "Mod manager for Planetary Annihilation Titans & Classic",
   "main": "main.js",
   "dependencies": {
+    "decompress": "^4.2.0",
     "jquery": "^3.3.1",
     "jszip": "^2.2.2",
     "knockout": "^3.4.2",
     "knockout.mapping": "^2.4.3",
     "lodash": "^4.17.10",
     "mkdirp": "^0.5.0",
-    "semver": "^2.3.0",
+    "semver": "^5.5.0",
     "sprintf-js": "^1.1.1"
   },
   "devDependencies": {

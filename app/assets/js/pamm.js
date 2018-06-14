@@ -3,7 +3,7 @@ var sprintf = require('sprintf-js').sprintf;
 var JSZip = require('jszip');
 var {shell,ipcRenderer} = require('electron');
 var _ = require('lodash');
-
+var decompress = require('decompress');
 //(function() {
 
 var url = require('url');
@@ -388,7 +388,7 @@ function jsGenerateModEntryHTML(objMod, boolIsInstalled) {
 	/* install/update/uninstall links */
 	if (!modInstalled) {
 		var usingTitans = pa.last.titans;
-		if((objMod.titansOnly && usingTitans) || (objMod.classicOnly && (!usingTitans)) || (objMod.titansOnly == undefined && objMod.classicOnly == undefined)){
+		if((objMod.titansOnly && usingTitans) || (objMod.classicOnly && (!usingTitans)) || (!objMod.titansOnly && !objMod.classicOnly)){
 			strHTML_install_link = "<div class='mod_entry_link mod_entry_install_link'>[ <a href='#' data-action='install'>" + jsGetLocaleText('install') + "</a> ]</div>";
 		}else{
 			var classicOrTitansTxt = usingTitans ? "classic" : "titans";
@@ -1349,37 +1349,50 @@ function UpdatePAMM(info) {
 		tofile: zipfile,
 		success: function() {
 			try {
+				var proms = [];
 				var temppath = path.dirname(__dirname) + '/app_tmp';
 				var bkppath = path.dirname(__dirname) + '/app_backup';
 
 				var zipdata = fs.readFileSync(zipfile);
 				var zip = new JSZip(zipdata);
+				proms.push(new Promise(res => {
+					for (var i in zip.files) {
+						var file = zip.files[i];
+						if(file.name.includes('node_modules.zip')){
+							fs.writeFileSync(path.dirname(__dirname) + '/node_modules_update.zip',new Buffer(file.asUint8Array()));
+							fs.mkdirSync(temppath + '/node_modules');
+							console.log('unzipping node_modules');
+							proms.push(decompress(path.dirname(__dirname) + '/node_modules_update.zip', temppath + '/node_modules'));
+						}
 
-				for (var i in zip.files) {
-					var file = zip.files[i];
-
-					if (file.name.indexOf(info.name + '-stable/app/') !== 0)
-						continue;
-
-					var path2 = temppath + '/' + file.name.substring(21);
-
-					if (path2.indexOf('/', path2.length - 1) !== -1) {
-						if (fs.existsSync(path2))
+						if (file.name.indexOf(info.name + '-stable/app/') !== 0)
 							continue;
-						fs.mkdirSync(path2);
-					} else {
-						fs.writeFileSync(path2, new Buffer(file.asUint8Array()));
+
+						var path2 = temppath + '/' + file.name.substring(21);
+
+						if (path2.indexOf('/', path2.length - 1) !== -1) {
+							if (fs.existsSync(path2))
+								continue;
+							fs.mkdirSync(path2);
+						} else {
+							fs.writeFileSync(path2, new Buffer(file.asUint8Array()));
+						}
 					}
-				}
+					res();
+				}));
+				
+				Promise.all(proms).then(function(){
+					fs.unlinkSync(path.dirname(__dirname) + '/node_modules_update.zip');
+					if (fs.existsSync(bkppath)) {
+						rmdirRecurseSync(bkppath);
+					}
+					fs.renameSync(__dirname, bkppath);
+					fs.renameSync(temppath, __dirname);
 
-				if (fs.existsSync(bkppath)) {
-					rmdirRecurseSync(bkppath);
-				}
-				fs.renameSync(__dirname, bkppath);
-				fs.renameSync(temppath, __dirname);
-
-				alert('PAMM has been updated to ' + info.version + '\nIt should now restart automatically.');
-				RestartPAMM();
+					alert('PAMM has been updated to ' + info.version + '\nIt should now restart automatically.');
+					RestartPAMM();
+				});
+				
 			} catch (e) {
 				jsAddLogMessage(e, 1);
 				alert('PAMM failed to update itself to ' + info.version + ' (' + e + ')');
