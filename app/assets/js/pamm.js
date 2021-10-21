@@ -15,7 +15,8 @@ var pa = require('./assets/js/pa.js');
 var uberent = require('./assets/js/uberent.js');
 var pamm = require('./assets/js/pamm-api.js');
 
-var params = require('electron').remote.getGlobal('params');
+var params = require('@electron/remote').getGlobal('params');
+
 var devmode = params.devmode;
 var settings;
 

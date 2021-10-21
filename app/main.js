@@ -1,6 +1,9 @@
 // Electron modules
 // var for consistency with the rest of the project
 var {app,BrowserWindow,dialog,ipcMain} = require('electron');
+// electron remote init
+require('@electron/remote/main').initialize()
+
 //checking nodejs modules here
 try{
 	require('semver');
@@ -82,8 +85,14 @@ app.on('ready', function() {
 		mainWindow = new BrowserWindow({
 			width: 1280,
 			height: 720,
-			icon: path.join(__dirname, 'assets/img/pamm.png')
+			icon: path.join(__dirname, 'assets/img/pamm.png'),
+			webPreferences: {
+				nodeIntegration: true,
+				contextIsolation: false,
+				enableRemoteModule: true
+			}
 		});
+		require("@electron/remote/main").enable(mainWindow.webContents)
 		//mainWindow.setMenu(null);
 		// and load the index.html of the app.
 		console.log('Load main page');

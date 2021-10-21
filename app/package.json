@@ -4,6 +4,7 @@
   "description": "Mod manager for Planetary Annihilation Titans & Classic",
   "main": "main.js",
   "dependencies": {
+    "@electron/remote": "^2.0.1",
     "decompress": "^4.2.0",
     "jquery": "^3.3.1",
     "jszip": "^2.2.2",
@@ -15,7 +16,7 @@
     "sprintf-js": "^1.1.1"
   },
   "devDependencies": {
-    "electron": "^2.0.2"
+    "electron": "^10"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
